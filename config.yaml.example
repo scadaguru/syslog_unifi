@@ -1,0 +1,16 @@
+logs:
+  level: info # debug, info(default), warning, error, critical
+  syslog_log: syslog-unifi # without extension, log extension will be added automatically
+  monitor_log: app # without extension, log extension will be added automatically
+  prepend_timestamp: false # prepend time stamp before each syslog line
+  append_new_line: true # append new line character at the end of each syslog line
+  purge_after_days: 120
+
+notifications:
+  max_notify_count_per_device_per_day: 5 # default: 5
+  do_not_disturb_start_hour: 22 # default: 22, if start/end both same then igored and will notify always
+  do_not_disturb_end_hour: 8 # default: 8, if start/end both same then igored and will notify always, if end_hour is lower than start_hour it will assume next day!
+
+telegram:
+  chat_id: CHAT_ID # telegram chat-id something like 123456789
+  api_token: "API_TOKEN" # telegram api token something like 123456789:XYZ-ABCDEFGHIJKL

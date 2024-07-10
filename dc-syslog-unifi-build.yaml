@@ -1,0 +1,21 @@
+# Notes:
+# To rebuild without deleting whole image:
+#   sudo docker compose -f dc-syslog-unifi-build.yaml up -d --build --force-recreate --no-deps syslog_unifi
+# To attach to the running container:
+#   sudo docker exec -it syslog_unifi /bin/sh
+
+version: '3.9'
+services:
+  syslog_unifi: # Docker container name
+    build:
+      context: .
+      dockerfile: ./dockerfile_syslog_unifi
+    image: syslog_unifi
+    container_name: syslog_unifi
+    volumes:
+      - ./:/config
+      - /etc/localtime:/etc/localtime:ro
+    ports:
+      - 5142:5142/udp
+      - 8085:8080
+    restart: unless-stopped  # Restart policy

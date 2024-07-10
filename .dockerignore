@@ -1,0 +1,13 @@
+# ignore following directories at any level
+**logs 
+**/bin
+**/obj
+**/__pycache__
+**/pdfs
+**/.vscode
+
+# ignore following files at any level
+*.log
+*.zip
+*.pyc
+*.pdf

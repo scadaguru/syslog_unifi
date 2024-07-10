@@ -1,0 +1,16 @@
+# Notes:
+# To run this image rebuild without deleting whole image:
+#   sudo docker compose -f docker-compose.yaml up -d
+
+version: '3.9'
+services:
+  syslog_unifi:
+    image: ghcr.io/scadaguru/syslog_unifi
+    container_name: syslog_unifi
+    volumes:
+      - ./:/config
+      - /etc/localtime:/etc/localtime:ro
+    ports:
+      - 5142:5142/udp
+      - 8085:8080
+    restart: unless-stopped
