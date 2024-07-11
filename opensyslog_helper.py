@@ -133,8 +133,9 @@ class OpensyslogHelper:
     def load_json_file(self, file_with_path):
         json_data = {}
         try:
-            with open(file_with_path, 'r') as file_handle_read:
-                json_data = json.load(file_handle_read)
+            if os.path.exists(file_with_path):
+                with open(file_with_path, 'r') as file_handle_read:
+                    json_data = json.load(file_handle_read)
         except IOError as e:
             exception_info = "load_json_file: {}: exception: {}\n Call Stack: {}".format(file_with_path, str(e), str(traceback.format_exc()))
             self.print(self.log_level_error, exception_info)

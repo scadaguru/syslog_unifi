@@ -18,8 +18,6 @@ class OpensyslogSyslog:
         msg_str = f"max_notify_count_per_device_per_day: {self.max_notify_count_per_device_per_day}, do_not_disturb_start_hour: {self.dnd_start_hour}, do_not_disturb_end_hour: {self.dnd_end_hour}"
         self.helper.print(self.helper.log_level_debug, msg_str)
 
-        self.is_currnet_time_outside_dnd()
-
     def monitor(self):
         self.helper.print(self.helper.log_level_debug, "OpensyslogSyslog:monitor(): enter")
         previous_string_data = ""
@@ -102,16 +100,12 @@ class OpensyslogSyslog:
 
     def is_currnet_time_outside_dnd(self):
         current_datetime = datetime.datetime.now()
-        self.dnd_start_datetime = datetime.datetime(current_datetime.year, current_datetime.month, current_datetime.day, self.dnd_start_hour, 0)
-        corrected_end_day = 1 if self.dnd_start_hour >  self.dnd_end_hour else 0
-        self.dnd_end_datetime = datetime.datetime(current_datetime.year, current_datetime.month, current_datetime.day + corrected_end_day, self.dnd_end_hour, 0)
-
-        msg_str = f"Current: {current_datetime}, start: {self.dnd_start_datetime}, end: {self.dnd_end_datetime}"
-        self.helper.print(self.helper.log_level_debug, msg_str)
-        status = True
-        if self.dnd_start_datetime <= current_datetime <= self.dnd_end_datetime:
-            self.helper.print(self.helper.log_level_debug, "The target datetime is within the range.")
-            status = False
+        dnd_start_datetime = datetime.datetime(current_datetime.year, current_datetime.month, current_datetime.day, self.dnd_start_hour, 0)
+        dnd_end_datetime = datetime.datetime(current_datetime.year, current_datetime.month, current_datetime.day, self.dnd_end_hour, 0)
+        if dnd_start_datetime <= dnd_end_datetime:
+            status = dnd_start_datetime <= current_datetime <= dnd_end_datetime
         else:
-            self.helper.print(self.helper.log_level_debug, "The target datetime is not within the range.")
-        return status
+            status = dnd_start_datetime <= current_datetime or current_datetime <= dnd_end_datetime
+        msg_str = f"Current: {current_datetime}, start: {dnd_start_datetime}, end: {dnd_end_datetime}, outside: {not status}"
+        self.helper.print(self.helper.log_level_info, msg_str)
+        return not status
