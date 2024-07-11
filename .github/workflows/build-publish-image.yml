@@ -21,5 +21,5 @@ jobs:
       - name: Build and push Docker image
         run: |
           docker login --username scadaguru --password ${{ secrets.GHCR_TOKEN }} ghcr.io
-          docker build . -t ghcr.io/scadaguru/syslog_unifi:${{ github.ref_name }} -t ghcr.io/scadaguru/syslog_unifi:v$(TZ="America/Chicago" date +'%Y%m%d.%H%M%S') -t ghcr.io/scadaguru/syslog_unifi
+          docker build . --build-arg GIT_TAG=${{ github.ref_name }} -t ghcr.io/scadaguru/syslog_unifi:${{ github.ref_name }} -t ghcr.io/scadaguru/syslog_unifi:v$(TZ="America/Chicago" date +'%Y%m%d.%H%M%S') -t ghcr.io/scadaguru/syslog_unifi
           docker push ghcr.io/scadaguru/syslog_unifi --all-tags
