@@ -75,7 +75,9 @@ class OpensyslogSyslog:
                 client_name = host_name
             json_data = self.dhcp_ack_json.get(mac_address)
             date_time_now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            first_time_seen = False
             if json_data is None:
+                first_time_seen = True
                 self.dhcp_ack_json[mac_address] = {"ip": ip_address, "name": client_name, "host_name": host_name, "reconnect_count_per_day": 1, "last_connected": date_time_now, "notify": True}
             else:
                 self.dhcp_ack_json[mac_address]["name"] = client_name # auto correct from the lookup file!
@@ -86,13 +88,13 @@ class OpensyslogSyslog:
                     self.dhcp_ack_json[mac_address]["reconnect_count_per_day"] += 1
             self.dhcp_ack_json[mac_address]["last_connected"] = date_time_now
             self.helper.save_dhcpack_status_json(self.dhcp_ack_json)
-            self.notify(mac_address)
+            self.notify(mac_address, "(New) " if first_time_seen else "")
         except Exception as e:
             exception_info = f"parse_message_data:exception: {str(e)}\n Call Stack: {str(traceback.format_exc())}"
             self.helper.print(self.helper.log_level_error, exception_info)
 
-    def notify(self, mac_address):
-        notify_msg = f'Network device got connected MAC: {mac_address}, IP: {self.dhcp_ack_json[mac_address]["ip"]}, Count: {self.dhcp_ack_json[mac_address]["reconnect_count_per_day"]}, Name: {self.dhcp_ack_json[mac_address]["name"]}'
+    def notify(self, mac_address, is_new):
+        notify_msg = f'{is_new}Device got connected Name: {self.dhcp_ack_json[mac_address]["name"]}, IP: {self.dhcp_ack_json[mac_address]["ip"]}, MAC: {mac_address}, Count: {self.dhcp_ack_json[mac_address]["reconnect_count_per_day"]}'
         notified = False
         if self.dhcp_ack_json[mac_address]["notify"] and \
             (self.dhcp_ack_json[mac_address]["reconnect_count_per_day"] < self.max_notify_count_per_device_per_day or self.dhcp_ack_json[mac_address]["reconnect_count_per_day"] % 10 == 1) and \
