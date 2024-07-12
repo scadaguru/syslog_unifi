@@ -14,3 +14,8 @@ notifications:
 telegram:
   chat_id: CHAT_ID # telegram chat-id something like 123456789
   api_token: "API_TOKEN" # telegram api token something like 123456789:XYZ-ABCDEFGHIJKL
+
+client_name_lookup:
+  csv_file_name: name-from-mac.csv
+  column_for_mac: mac_address
+  column_for_name: name

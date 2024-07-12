@@ -9,7 +9,7 @@ services:
   syslog_unifi: # Docker container name
     build:
       context: .
-      dockerfile: ./dockerfile_syslog_unifi
+      dockerfile: ./Dockerfile
     image: syslog_unifi
     container_name: syslog_unifi
     volumes:

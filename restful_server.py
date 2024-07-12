@@ -65,9 +65,10 @@ def get_webpage_sortby_ip_address():
     return html_str
 
 def generate_html(sorted_json):
-    html_str = "<table cellspacing=0px border=1><tr><th>MAC Address</th><th>IP Address</th><th>Client Name</th><th>Reconnect Count Per Day</th><th>Last connected</th></tr>"
+    html_str = "<table cellspacing=0px border=1><tr><th>MAC Address</th><th>IP Address</th><th>Client Name</th><th>Host Name</th><th>Reconnect Count Per Day</th><th>Last connected</th></tr>"
     for key, value in sorted_json.items():
-        html_str += "<tr><td>{}</td><td>{}</td><td>{}</td><td>{}</td><td>{}</td></tr>".format(key, value["ip"], value["name"], value["reconnect_count_per_day"], value["last_connected"])
+        host_name = value.get('host_name', value['name'])
+        html_str += f"<tr><td>{key}</td><td>{value['ip']}</td><td>{value['name']}</td><td>{host_name}</td><td>{value['reconnect_count_per_day']}</td><td>{value['last_connected']}</td></tr>"
     html_str += "</table>"
     return html_str
 

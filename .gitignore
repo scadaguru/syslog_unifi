@@ -1,0 +1,4 @@
+config.yaml
+**logs 
+unifi_dhcpack_status.json
+notification_history.json

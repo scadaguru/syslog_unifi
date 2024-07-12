@@ -2,6 +2,7 @@ import datetime
 import os
 import yaml  # this needs package called PyYAML
 import json
+import csv
 import traceback
 import requests
 
@@ -16,6 +17,7 @@ class OpensyslogHelper:
     log_level_critical = 5
 
     def __init__(self, config_folder):
+        self.mac_to_name_lookup_dict = {}
         self.config_folder = config_folder
         self.config = yaml.safe_load(open(self.config_folder + 'config.yaml'))
 
@@ -45,6 +47,8 @@ class OpensyslogHelper:
         if not os.path.exists(self.log_folder):
             os.makedirs(self.config_folder + "logs")
             self.print(self.log_level_info, "OpensyslogHelper:__init__(): Creating folder: " + self.log_folder)
+
+        self.setup_lookup_csv_file()
 
     def get_log_level_to_string(self, log_level):
         log_level_str = ": "
@@ -137,7 +141,7 @@ class OpensyslogHelper:
                 with open(file_with_path, 'r') as file_handle_read:
                     json_data = json.load(file_handle_read)
         except IOError as e:
-            exception_info = "load_json_file: {}: exception: {}\n Call Stack: {}".format(file_with_path, str(e), str(traceback.format_exc()))
+            exception_info = f"load_json_file: {file_with_path}: exception: {str(e)}\n Call Stack: {str(traceback.format_exc())}"
             self.print(self.log_level_error, exception_info)
         return json_data
 
@@ -146,7 +150,7 @@ class OpensyslogHelper:
             with open(file_with_path, 'w') as file_handle_write:
                 file_handle_write.write(json.dumps(json_data, indent=4))
         except IOError as e:
-            exception_info = "save_json_file: {}: exception: {}\n Call Stack: {}".format(file_with_path, str(e), str(traceback.format_exc()))
+            exception_info = f"save_json_file: {file_with_path}: exception: {str(e)}\n Call Stack: {str(traceback.format_exc())}"
             self.print(self.log_level_error, exception_info)
 
     def notify_telegram(self, message_data):
@@ -162,5 +166,27 @@ class OpensyslogHelper:
                     err = f"sendMessage error: failed to send, status: {resp.status_code}, reason: {resp.reason}, text: {resp.text}"
                     self.print(self.log_level_error, err)
         except Exception as e:
-            exception_info = "notify_telegram: {}: exception: {}\n Call Stack: {}".format(str(e), str(traceback.format_exc()))
+            exception_info = f"notify_telegram: exception: {str(e)}\n Call Stack: {str(traceback.format_exc())}"
             self.print(self.log_level_error, exception_info)
+
+    def setup_lookup_csv_file(self):
+        self.mac_to_name_lookup_dict = {}
+        try:
+            lookup_key = self.config.get("client_name_lookup", "")
+            if lookup_key is not None:
+                file_name = self.config["client_name_lookup"].get("csv_file_name", "").strip()
+                if file_name is not None and len(file_name) > 0:
+                    file_name_with_path = self.config_folder + file_name
+                    if os.path.exists(file_name_with_path):
+                        with open(file_name_with_path, "r") as csv_file:
+                            self.mac_to_name_lookup_col_for_mac = self.config["client_name_lookup"].get("column_for_mac", "").strip()
+                            self.mac_to_name_lookup_col_for_name = self.config["client_name_lookup"].get("column_for_name", "").strip()
+                            for row in csv.DictReader(csv_file):
+                                self.mac_to_name_lookup_dict[row[self.mac_to_name_lookup_col_for_mac].upper()] = row[self.mac_to_name_lookup_col_for_name]
+                            self.print(self.log_level_info, f"Successfully loaded CSV lookup file with {len(self.mac_to_name_lookup_dict)} rows")
+        except Exception as e:
+            exception_info = f"setup_lookup_csv_file: exception: {str(e)}\n Call Stack: {str(traceback.format_exc())}"
+            self.print(self.log_level_error, exception_info)
+
+    def lookup_device_name_from_csv(self, mac_address):
+        return self.mac_to_name_lookup_dict.get(mac_address.upper(), None)
