@@ -4,10 +4,12 @@ logs:
   monitor_log: app # without extension, log extension will be added automatically
   prepend_timestamp: false # prepend time stamp before each syslog line
   append_new_line: true # append new line character at the end of each syslog line
-  purge_after_days: 120
+  purge_after_days: 7 # default 7 days
 
 notifications:
-  max_notify_count_per_device_per_day: 5 # default: 5
+  notification_string: "Device got connected Name: {NAME}, IP: {IP}, MAC: {MAC}, Count: {COUNT}" # Use any of these variables {NAME}, {IP}, {MAC}, {COUNT}
+  default_notify_type: 6 # default:6, 1=Do not notify, 2=Notify only first time connect, 3=Notify only first time connect or IP changed, 4=always notify, 5=always notify till max count, 6=always notify till max count and then intermittent
+  max_notify_count_per_device_per_day: 5 # default: 5, this will apply for all notification types, to disable it make this number very high like 99999
   do_not_disturb_start_hour: 22 # default: 22, if start/end both same then igored and will notify always
   do_not_disturb_end_hour: 8 # default: 8, if start/end both same then igored and will notify always, if end_hour is lower than start_hour it will assume next day!
 
@@ -17,5 +19,5 @@ telegram:
 
 client_name_lookup:
   csv_file_name: name-from-mac.csv
-  column_for_mac: mac_address
+  column_for_mac: mac
   column_for_name: name

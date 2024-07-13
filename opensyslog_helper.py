@@ -1,13 +1,12 @@
 import datetime
 import os
-import yaml  # this needs package called PyYAML
 import json
 import csv
 import traceback
+import yaml
 import requests
 
-UNIFI_DHCPACK_FILE = 'unifi_dhcpack_status.json'
-NOTIFICATION_HIST_FILE  = 'notification_history.json'
+import const
 
 class OpensyslogHelper:
     log_level_debug = 1
@@ -19,7 +18,7 @@ class OpensyslogHelper:
     def __init__(self, config_folder):
         self.mac_to_name_lookup_dict = {}
         self.config_folder = config_folder
-        self.config = yaml.safe_load(open(self.config_folder + 'config.yaml'))
+        self.config = yaml.safe_load(open(self.config_folder + const.APP_CONFIG_FILE))
 
         self.log_level = 2
         if self.config["logs"]["level"] == "debug":
@@ -117,22 +116,22 @@ class OpensyslogHelper:
         self.print(self.log_level_debug, "Finished purging older files")
 
     def load_dhcpack_status_json(self):
-        return self.load_json_file(self.config_folder + UNIFI_DHCPACK_FILE)
+        return self.load_json_file(self.config_folder + const.JSON_FILE_UNIFI_DHCPACK_FILE)
 
     def save_dhcpack_status_json(self, dhcp_ack_json):
-        self.save_json_file(self.config_folder + UNIFI_DHCPACK_FILE, dhcp_ack_json)
+        self.save_json_file(self.config_folder + const.JSON_FILE_UNIFI_DHCPACK_FILE, dhcp_ack_json)
 
     def load_notification_history_json(self):
-        return self.load_json_file(self.config_folder + NOTIFICATION_HIST_FILE)
+        return self.load_json_file(self.config_folder + const.JSON_FILE_NOTIFICATION_HIST_FILE)
 
     def append_notification_history(self, notification_text):
-        history_json = self.load_json_file(self.config_folder + NOTIFICATION_HIST_FILE)
+        history_json = self.load_json_file(self.config_folder + const.JSON_FILE_NOTIFICATION_HIST_FILE)
         date_time_now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
         history_json[date_time_now] = notification_text
         self.save_notification_history(history_json)
 
     def save_notification_history(self, notification_history_json):
-        self.save_json_file(self.config_folder + NOTIFICATION_HIST_FILE, notification_history_json)
+        self.save_json_file(self.config_folder + const.JSON_FILE_NOTIFICATION_HIST_FILE, notification_history_json)
 
     def load_json_file(self, file_with_path):
         json_data = {}
@@ -158,7 +157,7 @@ class OpensyslogHelper:
             # telegram API: https://core.telegram.org/bots/api#sendmessage
             telegram_message_url = self.base_url + "/sendMessage"
             if message_data != "":
-                data = {"chat_id": self.bot_chat_id, 'text': message_data}
+                data = {"chat_id": self.bot_chat_id, 'text': message_data, 'parse_mode' : 'HTML'}
                 resp = requests.post(telegram_message_url, data=data, timeout=30)
                 if resp.status_code == 200:
                     self.print(self.log_level_debug, "Sent message successfully")
