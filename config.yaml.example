@@ -8,14 +8,14 @@ logs:
 
 notifications:
   notification_string: "Device got connected Name: {NAME}, IP: {IP}, MAC: {MAC}, Count: {COUNT}" # Use any of these variables {NAME}, {IP}, {MAC}, {COUNT}
-  default_notify_type: 6 # default:6, 1=Do not notify, 2=Notify only first time connect, 3=Notify only first time connect or IP changed, 4=always notify, 5=always notify till max count, 6=always notify till max count and then intermittent
+  default_notify_type: 6 # default:6, 1=Do not notify, 2=Notify only first time connect, 3=Notify only first time connect or IP changed, 4=always notify, 5=always notify till max count, 6=always notify till max count and then intermittent, 7=do not notify if device present in lookup file
   max_notify_count_per_device_per_day: 5 # default: 5, this will apply for all notification types, to disable it make this number very high like 99999
   do_not_disturb_start_hour: 22 # default: 22, if start/end both same then igored and will notify always
   do_not_disturb_end_hour: 8 # default: 8, if start/end both same then igored and will notify always, if end_hour is lower than start_hour it will assume next day!
 
 telegram:
-  chat_id: CHAT_ID # telegram chat-id something like 123456789
-  api_token: "API_TOKEN" # telegram api token something like 123456789:XYZ-ABCDEFGHIJKL
+  chat_id: # telegram chat-id something like 123456789
+  api_token: # telegram api token something like 123456789:XYZ-ABCDEFGHIJKL
 
 client_name_lookup:
   csv_file_name: name-from-mac.csv
