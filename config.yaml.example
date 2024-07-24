@@ -14,8 +14,8 @@ notifications:
   do_not_disturb_end_hour: 8 # default: 8, if start/end both same then igored and will notify always, if end_hour is lower than start_hour it will assume next day!
 
 telegram:
-  chat_id: # telegram chat-id something like 123456789
-  api_token: # telegram api token something like 123456789:XYZ-ABCDEFGHIJKL
+  chat_id: CHAT_ID # telegram chat-id something like 123456789
+  api_token: "API_TOKEN" # telegram api token something like 123456789:XYZ-ABCDEFGHIJKL
 
 client_name_lookup:
   csv_file_name: name-from-mac.csv
