@@ -142,6 +142,8 @@ class OpensyslogSyslog:
             case const.NOTIFY_CONNECT_EACH_TIME_WITH_MAX_PER_DAY_WITH_INTERMITTENT:
                 return (self.dhcp_ack_json[mac_address]["reconnect_count_per_day"] <= self.max_notify_count_per_device_per_day) or \
                     self.dhcp_ack_json[mac_address]["reconnect_count_per_day"] % 10 == 1
+            case const.NOTIFY_CONNECT_DEVICE_NOT_IN_LOOKUP_FILE:
+                return not self.helper.lookup_device_name_from_csv(mac_address)
             case _:
                 return False
 
